@@ -10,6 +10,7 @@ const lootFilesPaths = {
   rare: path.resolve(LOOT_FILES_DIR_PATH, "rare.txt"),
   veryRare: path.resolve(LOOT_FILES_DIR_PATH, "rare.txt"),
   legendary: path.resolve(LOOT_FILES_DIR_PATH, "legendary.txt"),
+  blacklisted: path.resolve(LOOT_FILES_DIR_PATH, "blacklist.txt"),
 };
 
 const loot = {
@@ -53,6 +54,13 @@ const loot = {
   },
 };
 
+const blacklistedLoot = new Set(
+  fs
+    .readFileSync(lootFilesPaths.blacklisted, "utf-8")
+    .split(os.EOL)
+    .filter((item) => item.trim() !== ""),
+);
+
 export function getRandomLoot(
   lootPoints,
   coefficients,
@@ -74,42 +82,106 @@ export function getRandomLoot(
   if (commonCoefficient + magicCoefficient !== 1) {
     throw new Error("The sum of common and magic coefficients must be 1");
   }
-  if (uncommonCoefficient + rareCoefficient + veryRareCoefficient + legendaryCoefficient !== 1) {
-    throw new Error("The sum of uncommon, rare, very rare and legendary coefficients must be 1");
+  if (
+    uncommonCoefficient +
+      rareCoefficient +
+      veryRareCoefficient +
+      legendaryCoefficient !==
+    1
+  ) {
+    throw new Error(
+      "The sum of uncommon, rare, very rare and legendary coefficients must be 1",
+    );
   }
 
-  return new Array(lootPoints)
-    .fill(0)
-    .map(() => getRandInt(1, 20))
-    .filter((roll) => roll >= successLootD20Threshold)
-    .map(() => {
-      const lootRoll = getRandInt(1, 100);
-      const lootType = lootRoll <= magicCoefficient * 100 ? "magic" : "common";
+  const isAllItemsBlacklisted =
+    loot.common.items.concat(
+      Object.values(loot.magic).flatMap(({ items }) => items),
+    ).length === blacklistedLoot.size;
 
-      if (lootType === "common") {
+  if (isAllItemsBlacklisted) {
+    // empty the blacklist
+    fs.writeFileSync(lootFilesPaths.blacklisted, "", { flag: "w" });
+  }
+
+  return (
+    new Array(lootPoints)
+      .fill(0)
+      .map(() => getRandInt(1, 20))
+      .filter((roll) => roll >= successLootD20Threshold)
+      .map(() => {
+        const lootRoll = getRandInt(1, 100);
+        const lootType =
+          lootRoll <= magicCoefficient * 100 ? "magic" : "common";
+
+        if (lootType === "common") {
+          return {
+            type: "common",
+            item: loot.common.items[
+              getRandInt(0, loot.common.items.length - 1)
+            ],
+          };
+        }
+
+        const magicRoll = getRandInt(1, 100);
+        const magicType =
+          magicRoll <= uncommonCoefficient * 100
+            ? "uncommon"
+            : magicRoll <= (uncommonCoefficient + rareCoefficient) * 100
+              ? "rare"
+              : magicRoll <=
+                  (uncommonCoefficient +
+                    rareCoefficient +
+                    veryRareCoefficient) *
+                    100
+                ? "veryRare"
+                : "legendary";
+
+        const magicItems = loot.magic[magicType].items;
+
         return {
-          type: "common",
-          item: loot.common.items[getRandInt(0, loot.common.items.length - 1)],
+          type: magicType,
+          item: magicItems[getRandInt(0, magicItems.length - 1)],
         };
-      }
+      })
+      .map(({ type, item }) => {
+        if (blacklistedLoot.has(item)) {
+          const sameTypeMagicItems = loot.magic[type].items.filter(
+            (item) => !blacklistedLoot.has(item),
+          );
 
-      const magicRoll = getRandInt(1, 100);
-      const magicType =
-        magicRoll <= uncommonCoefficient * 100
-          ? "uncommon"
-          : magicRoll <= (uncommonCoefficient + rareCoefficient) * 100
-            ? "rare"
-            : magicRoll <=
-                (uncommonCoefficient + rareCoefficient + veryRareCoefficient) *
-                  100
-              ? "veryRare"
-              : "legendary";
+          const isAllBlacklisted = sameTypeMagicItems.length === 0;
 
-      const magicItems = loot.magic[magicType].items;
+          if (isAllBlacklisted) {
+            return null;
+          }
 
-      return {
-        type: magicType,
-        item: magicItems[getRandInt(0, magicItems.length - 1)],
-      };
-    });
+          const newRerolledItem =
+            sameTypeMagicItems[getRandInt(0, sameTypeMagicItems.length - 1)];
+
+          return {
+            type,
+            item: newRerolledItem,
+          };
+        }
+
+        return { type, item };
+      })
+      .filter(Boolean)
+      // deduplicate
+      .filter(({ type, item }, index, self) => {
+        return (
+          index === self.findIndex((t) => t.type === type && t.item === item)
+        );
+      })
+      .map(({ type, item }) => {
+        if (item && type !== "blacklisted" && type !== "common") {
+          fs.writeFileSync(lootFilesPaths.blacklisted, `${item}${os.EOL}`, {
+            flag: "a",
+          });
+        }
+
+        return { type, item };
+      })
+  );
 }
