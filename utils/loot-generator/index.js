@@ -15,25 +15,40 @@ const lootFilesPaths = {
 const loot = {
   common: {
     coefficient: 0.6,
-    items: fs.readFileSync(lootFilesPaths.common, "utf-8").split(os.EOL),
+    items: fs
+      .readFileSync(lootFilesPaths.common, "utf-8")
+      .split(os.EOL)
+      .filter((item) => item.trim() !== ""),
   },
   magic: {
     coefficient: 0.4,
     uncommon: {
       coefficient: 0.5,
-      items: fs.readFileSync(lootFilesPaths.uncommon, "utf-8").split(os.EOL),
+      items: fs
+        .readFileSync(lootFilesPaths.uncommon, "utf-8")
+        .split(os.EOL)
+        .filter((item) => item.trim() !== ""),
     },
     rare: {
       coefficient: 0.25,
-      items: fs.readFileSync(lootFilesPaths.rare, "utf-8").split(os.EOL),
+      items: fs
+        .readFileSync(lootFilesPaths.rare, "utf-8")
+        .split(os.EOL)
+        .filter((item) => item.trim() !== ""),
     },
     veryRare: {
       coefficient: 0.15,
-      items: fs.readFileSync(lootFilesPaths.veryRare, "utf-8").split(os.EOL),
+      items: fs
+        .readFileSync(lootFilesPaths.veryRare, "utf-8")
+        .split(os.EOL)
+        .filter((item) => item.trim() !== ""),
     },
     legendary: {
       coefficient: 0.1,
-      items: fs.readFileSync(lootFilesPaths.legendary, "utf-8").split(os.EOL),
+      items: fs
+        .readFileSync(lootFilesPaths.legendary, "utf-8")
+        .split(os.EOL)
+        .filter((item) => item.trim() !== ""),
     },
   },
 };
