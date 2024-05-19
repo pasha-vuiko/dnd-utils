@@ -59,7 +59,7 @@ export function getRandomLoot(
   successLootD20Threshold = 15,
 ) {
   const {
-    common: { coefficient = 0.6 },
+    common: { commonCoefficient = 0.6 },
     magic: {
       coefficient: magicCoefficient = 0.4,
       rareness: {
@@ -70,6 +70,13 @@ export function getRandomLoot(
       },
     },
   } = coefficients;
+
+  if (commonCoefficient + magicCoefficient !== 1) {
+    throw new Error("The sum of common and magic coefficients must be 1");
+  }
+  if (uncommonCoefficient + rareCoefficient + veryRareCoefficient + legendaryCoefficient !== 1) {
+    throw new Error("The sum of uncommon, rare, very rare and legendary coefficients must be 1");
+  }
 
   return new Array(lootPoints)
     .fill(0)
