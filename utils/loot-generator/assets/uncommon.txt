@@ -1,12 +1,70 @@
-1. Gauntlets of Ogre Power
-2. Gloves of Missile Snaring
-3. Amulet of the Drunkard
-4. Grappling hook
-5. Beg of holding
-6. Eversmoking Bottle
-7. Storm Boomerang
-8. Adamantine Armor (Plate)
-9. Ring of Jumping
-10. Winged Boots
-11. Greatsword+1
-12. Cloak of protection
+rod_of_retribution
+pearl_of_power
+gauntlets_of_ogre_power
+gloves_of_missile_snaring
+cloak_of_protection
+headband_of_intellect
+staff_of_adder
+adamantine_armor
+medallion_of_thoughts
+winged_boots
+wand_of_magic_missiles
+decanter_of_endless_water
+cloak_of_the_manta_ray
+magic/ring_of_jumping
+reszur
+Gauntlets of Ogre Power
+Gloves of Missile Snaring
+Amulet of the Drunkard
+Grappling hook
+Beg of holding
+Eversmoking Bottle
+Storm Boomerang
+Adamantine Armor (Plate)
+Ring of Jumping
+Winged Boots
+Tower Shield
+Cloak of protection
+Bracers of Archery
+Crossbow, Heavy, +1
+Periapt of Wound Closure
+Amulet of the Drunkard
+Iron Net
+Periapt of Wound Closure
+Weapon +1
+Immovable Rod
+Cloak of Protection
+Adamantine Armor
+Rope of Climbing
+Lantern of Revealing
+Glamerweave, Uncommon
+Winged Boots
+Shield +1
+Cursed Item
+Cursed Item
+Cursed Item
+alchemy-jug
+boots-of-elvenkind
+brooch-of-shielding
+broom-of-flying
+cloak-of-elvenkind
+cloak-of-protection
+eyes-of-the-eagle
+gloves-of-missile-snaring
+headband-of-intellect
+bag-of-holding
+javelin-of-lightning
+sentinel-shield
+staff-of-the-python
+staff-of-the-woodlands
+pearl-of-power
+Moon Sickle
+Slippers of Spider Climbing
+Hat of Vermin
+Bag of Holding
+Winged Boots
+Bag of Tricks
+Staff of the Python
+Headband of Intellect
+Nature’s Mantle
+Necklace of Adaptation

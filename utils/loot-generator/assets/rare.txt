@@ -1,10 +1,39 @@
-1. Belt of Hill Giant Strength
-2. Flame tounge greatsword
-3. Mizzium plate armor
-4. Ring of free action
-5. Amulet of Health
-6. Cloak of displacement
-7. Ring of Protection
-8. Iron Bands of Bilarro
-9. Mantle of Spell Resistance
-10. Ring of Evasion
+Ring of Spell Storing
+Staff of the Woodlands
+Staff of Healing
+Ring of Animal Influence
+Bag of Beans
+Amulet of Health
+Necklace of Prayer Beads
+Robe Of Eyes
+Belt of Hill Giant Strength (hill)
+Flame Tongue
+Cloak of Displacement
+Mizzium Armor
+Mantle of Spell Resistance
+Stormrider Boots
+Ring of Evasion
+Order of the Silver Dragon +2 Shield
+Cursed Item
+Cursed Item
+Belt of Hill Giant Strength
+Dragon Wing Bow
+Mizzium plate armor
+Ring of free action
+Amulet of Health
+Cloak of displacement
+Ring of Protection
+Iron Bands of Bilarro
+Mantle of Spell Resistance
+Ring of Evasion
+belt_of_hill_giant_strength_(hill)
+flame_tongue
+sword_of_wounding
+wand_of_lightning_bolts
+ring_of_protection
+ring_of_spell_storing
+rod_of_hellish_flames
+brazier_of_commanding_fire_elementals
+wand_of_fireballs 
+amulet_of_health
+Necro Bow
