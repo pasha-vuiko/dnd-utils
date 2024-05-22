@@ -75,7 +75,7 @@ export function getRandomLoot(
   successLootD20Threshold = 15,
 ) {
   const {
-    common: { commonCoefficient = 0.5 },
+    common: { coefficient: commonCoefficient = 0.5 },
     consumables: { coefficient: consumablesCoefficient = 0.2 },
     magic: {
       coefficient: magicCoefficient = 0.3,
