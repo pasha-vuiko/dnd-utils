@@ -6,6 +6,7 @@ import { getRandInt } from "../get-rand-int.js";
 const LOOT_FILES_DIR_PATH = path.resolve(import.meta.dirname, "assets");
 const lootFilesPaths = {
   common: path.resolve(LOOT_FILES_DIR_PATH, "common.txt"),
+  consumables: path.resolve(LOOT_FILES_DIR_PATH, "consumables.txt"),
   uncommon: path.resolve(LOOT_FILES_DIR_PATH, "uncommon.txt"),
   rare: path.resolve(LOOT_FILES_DIR_PATH, "rare.txt"),
   veryRare: path.resolve(LOOT_FILES_DIR_PATH, "rare.txt"),
@@ -15,41 +16,47 @@ const lootFilesPaths = {
 
 const loot = {
   common: {
-    coefficient: 0.6,
     items: fs
       .readFileSync(lootFilesPaths.common, "utf-8")
       .split(os.EOL)
-      .filter((item) => item.trim() !== ""),
+      .filter((item) => item.trim() !== "")
+      .map((item) => item.trim()),
+  },
+  consumables: {
+    items: fs
+      .readFileSync(lootFilesPaths.consumables, "utf-8")
+      .split(os.EOL)
+      .filter((item) => item.trim() !== "")
+      .map((item) => item.trim()),
   },
   magic: {
-    coefficient: 0.4,
     uncommon: {
-      coefficient: 0.5,
       items: fs
         .readFileSync(lootFilesPaths.uncommon, "utf-8")
         .split(os.EOL)
-        .filter((item) => item.trim() !== ""),
+        .filter((item) => item.trim() !== "")
+        .map((item) => item.trim()),
     },
     rare: {
-      coefficient: 0.25,
       items: fs
         .readFileSync(lootFilesPaths.rare, "utf-8")
         .split(os.EOL)
-        .filter((item) => item.trim() !== ""),
+        .filter((item) => item.trim() !== "")
+        .map((item) => item.trim()),
     },
     veryRare: {
-      coefficient: 0.15,
       items: fs
         .readFileSync(lootFilesPaths.veryRare, "utf-8")
         .split(os.EOL)
-        .filter((item) => item.trim() !== ""),
+        .filter((item) => item.trim() !== "")
+        .map((item) => item.trim()),
     },
     legendary: {
-      coefficient: 0.1,
       items: fs
         .readFileSync(lootFilesPaths.legendary, "utf-8")
         .split(os.EOL)
-        .filter((item) => item.trim() !== ""),
+        .filter((item) => item.trim() !== "")
+        .map((item) => item.trim()),
     },
   },
 };
@@ -58,7 +65,8 @@ const blacklistedLoot = new Set(
   fs
     .readFileSync(lootFilesPaths.blacklisted, "utf-8")
     .split(os.EOL)
-    .filter((item) => item.trim() !== ""),
+    .filter((item) => item.trim() !== "")
+    .map((item) => item.trim()),
 );
 
 export function getRandomLoot(
@@ -67,26 +75,30 @@ export function getRandomLoot(
   successLootD20Threshold = 15,
 ) {
   const {
-    common: { commonCoefficient = 0.6 },
+    common: { commonCoefficient = 0.5 },
+    consumables: { coefficient: consumablesCoefficient = 0.2 },
     magic: {
-      coefficient: magicCoefficient = 0.4,
+      coefficient: magicCoefficient = 0.3,
       rareness: {
-        uncommon: { coefficient: uncommonCoefficient = 0.5 },
-        rare: { coefficient: rareCoefficient = 0.25 },
-        veryRare: { coefficient: veryRareCoefficient = 0.15 },
+        uncommon: { coefficient: uncommonCoefficient = 0.4 },
+        rare: { coefficient: rareCoefficient = 0.3 },
+        veryRare: { coefficient: veryRareCoefficient = 0.2 },
         legendary: { coefficient: legendaryCoefficient = 0.1 },
       },
     },
   } = coefficients;
 
-  if (commonCoefficient + magicCoefficient !== 1) {
-    throw new Error("The sum of common and magic coefficients must be 1");
+  if (commonCoefficient + consumablesCoefficient + magicCoefficient > 1) {
+    throw new Error(
+      "The sum of common, consumables and magic coefficients must be 1",
+    );
   }
+
   if (
     uncommonCoefficient +
       rareCoefficient +
       veryRareCoefficient +
-      legendaryCoefficient !==
+      legendaryCoefficient >
     1
   ) {
     throw new Error(
@@ -112,13 +124,26 @@ export function getRandomLoot(
       .map(() => {
         const lootRoll = getRandInt(1, 100);
         const lootType =
-          lootRoll <= magicCoefficient * 100 ? "magic" : "common";
+          lootRoll <= commonCoefficient * 100
+            ? "common"
+            : lootRoll <= (commonCoefficient + consumablesCoefficient) * 100
+              ? "consumables"
+              : "magic";
 
         if (lootType === "common") {
           return {
             type: "common",
             item: loot.common.items[
               getRandInt(0, loot.common.items.length - 1)
+            ],
+          };
+        }
+
+        if (lootType === "consumables") {
+          return {
+            type: "consumables",
+            item: loot.consumables.items[
+              getRandInt(0, loot.consumables.items.length - 1)
             ],
           };
         }
@@ -175,7 +200,7 @@ export function getRandomLoot(
         );
       })
       .map(({ type, item }) => {
-        if (item && type !== "blacklisted" && type !== "common") {
+        if (item && type !== "blacklisted" && type !== "common" && type !== "consumables") {
           fs.writeFileSync(lootFilesPaths.blacklisted, `${item}${os.EOL}`, {
             flag: "a",
           });

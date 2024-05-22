@@ -24,20 +24,21 @@ import { getRandomLoot } from "./utils/loot-generator/index.js";
 // );
 
 const loot = getRandomLoot(
-  2,
+  10,
   {
-    common: { coefficient: 0.6 },
+    common: { coefficient: 0.5 },
+    consumables: { coefficient: 0.2 },
     magic: {
-      coefficient: 0.4,
+      coefficient: 0.3,
       rareness: {
-        uncommon: { coefficient: 0.94 },
-        rare: { coefficient: 0.05 },
-        veryRare: { coefficient: 0.01 },
-        legendary: { coefficient: 0.0 },
+        uncommon: { coefficient: 0.4 },
+        rare: { coefficient: 0.3 },
+        veryRare: { coefficient: 0.2 },
+        legendary: { coefficient: 0.1 },
       },
     },
   },
-  12,
+  15,
 );
 
 console.log(
