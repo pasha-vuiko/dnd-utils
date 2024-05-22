@@ -90,7 +90,7 @@ export function getRandomLoot(
 
   if (commonCoefficient + consumablesCoefficient + magicCoefficient > 1) {
     throw new Error(
-      "The sum of common, consumables and magic coefficients must be 1",
+      "The sum of common, consumables and magic coefficients must not be greater than 1",
     );
   }
 
@@ -102,7 +102,7 @@ export function getRandomLoot(
     1
   ) {
     throw new Error(
-      "The sum of uncommon, rare, very rare and legendary coefficients must be 1",
+      "The sum of uncommon, rare, very rare and legendary coefficients must not be greater than 1",
     );
   }
 
