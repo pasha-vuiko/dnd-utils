@@ -4,14 +4,14 @@
   "description": "",
   "private": true,
   "type": "module",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "prettier": "^3.2.5"
+    "prettier": "^3.4.2"
   }
 }

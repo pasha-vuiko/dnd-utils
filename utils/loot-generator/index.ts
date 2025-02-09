@@ -1,7 +1,7 @@
 import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
-import { getRandInt } from "../get-rand-int.js";
+import { getRandInt } from "../get-rand-int.ts";
 
 const LOOT_FILES_DIR_PATH = path.resolve(import.meta.dirname, "assets");
 const lootFilesPaths = {

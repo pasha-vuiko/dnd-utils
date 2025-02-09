@@ -1,4 +1,4 @@
-import { getRandInt } from "./get-rand-int.js";
+import { getRandInt } from "./get-rand-int.ts";
 
 function getD6DamageRolls(d6Amount) {
   return new Array(d6Amount).fill(0).map(() => getRandInt(1, 6));
