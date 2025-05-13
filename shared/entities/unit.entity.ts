@@ -1,5 +1,6 @@
 import { Weapon, WeaponAttackOutput } from "./weapon.entity";
 import { PhysicalDamageType } from "../enums/physical-damage-type.enum";
+import { calculateModifier } from "../../utils/calculate-modifier";
 
 export abstract class Unit {
   public currHealth: number;
@@ -39,10 +40,6 @@ export abstract class Unit {
     return this;
   }
 
-  protected calculateModifier(characteristic: number) {
-    return Math.floor((characteristic - 10) / 2);
-  }
-
   protected makeBasicAttack(
     attackCharacteristicValue: number,
     weaponType: "melee" | "ranged",
@@ -50,7 +47,7 @@ export abstract class Unit {
     additionalAttackBonus = 0,
   ): WeaponAttackOutput {
     const { proficiencyBonus } = this.statBlock;
-    const attackModifier = this.calculateModifier(attackCharacteristicValue);
+    const attackModifier = calculateModifier(attackCharacteristicValue);
 
     if (weaponType === "melee") {
       return this.meleeWeapon.attack(

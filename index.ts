@@ -18,7 +18,7 @@ import { getRandomLoot } from "./utils/loot-generator/index";
 console.log(
   "Flame tongue damage:",
   calculateFlameToungeDamage({
-    totalBonus: 6,
+    totalBonus: 9,
     physicalDamageD6Amount: 2,
     flameDamageD6Amount: 2,
     savageAttack: true,

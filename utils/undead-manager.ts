@@ -1,5 +1,10 @@
 import { Weapon, WeaponAttackOutput } from "../shared/entities/weapon.entity";
 import { StatBlock, Unit } from "../shared/entities/unit.entity";
+import { CharacteristicType } from "../shared/enums/characteristic-type.enum";
+import { rollDice } from "../shared/utils/roll-dice.util";
+import { DiceType } from "../shared/enums/dice-type.enum";
+import { calculateModifier } from "./calculate-modifier";
+import { omitObjKeys } from "../shared/utils/omit-obj-keys.util";
 
 export class UndeadManager {
   private undeads: Unit[];
@@ -31,6 +36,37 @@ export class UndeadManager {
     return this.makeAttacks(enemyArmorClass, "ranged");
   }
 
+  makeSavingThrows(type: CharacteristicType, limit: number): number {
+    const alive = this.undeads.filter((undead) => undead.isAlive);
+
+    let successCount = 0;
+
+    for (const undead of alive) {
+      const { statBlock } = undead;
+
+      const d20Roll = rollDice(DiceType.d20);
+      const modifier = (() => {
+        if (type === CharacteristicType.Strength)
+          return calculateModifier(statBlock.strength);
+        if (type === CharacteristicType.Dexterity)
+          return calculateModifier(statBlock.dexterity);
+        if (type === CharacteristicType.Constitution)
+          return calculateModifier(statBlock.constitution);
+        if (type === CharacteristicType.Intelligence)
+          return calculateModifier(statBlock.intelligence);
+        if (type === CharacteristicType.Wisdom)
+          return calculateModifier(statBlock.wisdom);
+        return calculateModifier(statBlock.charisma);
+      })();
+
+      if (d20Roll + modifier >= limit) {
+        successCount++;
+      }
+    }
+
+    return successCount;
+  }
+
   getAliveUndeads(): AliveUndeadsStatistics {
     const alive = this.undeads.filter((undead) => undead.isAlive);
     const dead = this.undeads.filter((undead) => !undead.isAlive);
@@ -47,7 +83,7 @@ export class UndeadManager {
     enemyArmorClass: number,
     attackType: "melee" | "ranged",
   ): UnitsAttackOutput {
-    const attacks: WeaponAttackWithUnitName[] = this.undeads
+    const allAttacks: WeaponAttackWithUnitName[] = this.undeads
       .filter((undead) => undead.isAlive)
       .map((undead) => {
         const attackOutput = (() => {
@@ -68,14 +104,16 @@ export class UndeadManager {
           ...attackOutput,
           unitName: undead.name,
         };
-      })
-      .filter(({ attack }) => attack >= enemyArmorClass);
+      });
+    const successfulAttacks = allAttacks.filter(
+      ({ attack }) => attack >= enemyArmorClass,
+    );
 
     let totalDamage = 0;
     let totalPhysicalDamage = 0;
     let totalMagicalDamage = 0;
 
-    for (const attack of attacks) {
+    for (const attack of successfulAttacks) {
       totalDamage += attack.totalDamage;
       totalPhysicalDamage += attack.physicalDamage;
       totalMagicalDamage += attack.magicalDamage;
@@ -86,8 +124,10 @@ export class UndeadManager {
       totalPhysicalDamage,
       totalMagicalDamage,
 
-      successfulAttacksCount: attacks.length,
-      successfulAttacks: attacks,
+      successfulAttacksCount: successfulAttacks.length,
+      successfulAttacks,
+
+      allAttacks,
     };
   }
 }
@@ -224,6 +264,60 @@ export class Skeleton extends Unit {
   }
 }
 
+export class DisplayAttachResultService {
+  static displayAllSuccessful(result: UnitsAttackOutput) {
+    console.log(omitObjKeys(result, "allAttacks"));
+  }
+
+  static displayForArmorClassRange(
+    result: UnitsAttackOutput,
+    armorClassRangeStart: number,
+    armorClassRangeEnd: number,
+    armorClassRangeStep = 1,
+    description = "",
+  ) {
+    const { allAttacks } = result;
+
+    const displayResult = [];
+
+    let currArmorClass = armorClassRangeStart;
+
+    while (currArmorClass <= armorClassRangeEnd) {
+      let totalDamage = 0;
+      let totalPhysicalDamage = 0;
+      let totalMagicalDamage = 0;
+
+      const successfulAttacks = allAttacks.filter(
+        (attack) => attack.attack >= currArmorClass,
+      );
+
+      for (const attack of successfulAttacks) {
+        totalDamage += attack.totalDamage;
+        totalPhysicalDamage += attack.physicalDamage;
+        totalMagicalDamage += attack.magicalDamage;
+      }
+
+      const attackRolls = successfulAttacks.map((attack) => attack.attack);
+      const rewAttackRolls = successfulAttacks.map((attack) => attack.rawAttackRoll);
+
+      displayResult.push({
+        armorClass: currArmorClass,
+        successfulAttacksCount: successfulAttacks.length,
+        totalDamage,
+        totalPhysicalDamage,
+        totalMagicalDamage,
+        attackRolls: `[${attackRolls.join(", ")}]`,
+        rewAttackRolls: `[${rewAttackRolls.join(", ")}]`,
+      });
+
+      currArmorClass += armorClassRangeStep;
+    }
+
+    console.log(description);
+    console.table(displayResult);
+  }
+}
+
 export interface UnitsAttackOutput {
   totalDamage: number;
   totalPhysicalDamage: number;
@@ -231,6 +325,7 @@ export interface UnitsAttackOutput {
 
   successfulAttacksCount: number;
   successfulAttacks: WeaponAttackWithUnitName[];
+  allAttacks: WeaponAttackWithUnitName[];
 }
 
 export interface WeaponAttackWithUnitName extends WeaponAttackOutput {
